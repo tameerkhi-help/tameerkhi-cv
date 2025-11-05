@@ -1921,7 +1921,7 @@
             z-index: 9999;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
             transform: translateX(150%);
-            transition: transform 0.5s cubic-bz(0.175, 0.885, 0.32, 1.275);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             max-width: 350px;
             display: flex;
             align-items: center;
@@ -3339,7 +3339,7 @@
         const firebaseConfig = {
             apiKey: "AIzaSyAdOwMj250weD2L_RWBpNplNF5OmM1R6j8",
             authDomain: "cv-build-tameerkhi.firebaseapp.com",
-            databaseURL: "https://cv-build-tameerkhi-default-rtdb.asia-southeast1.firebasedatabase.app",
+            databaseURL: "https://cv-build-tameerkhi-default-rtdb.firebaseio.com",
             projectId: "cv-build-tameerkhi",
             storageBucket: "cv-build-tameerkhi.appspot.com",
             messagingSenderId: "453337479839",
@@ -3365,20 +3365,10 @@
                 currentUser: null,
                 signInWithEmailAndPassword: () => Promise.reject(new Error("Firebase not available")),
                 createUserWithEmailAndPassword: () => Promise.reject(new Error("Firebase not available")),
-                signOut: () => Promise.reject(new Error("Firebase not available")),
-                onAuthStateChanged: (callback) => { callback(null); return () => {}; }
+                signOut: () => Promise.reject(new Error("Firebase not available"))
             };
             database = {
-                ref: () => ({ 
-                    set: () => Promise.reject(new Error("Firebase not available")),
-                    push: () => ({ set: () => Promise.reject(new Error("Firebase not available")) })
-                })
-            };
-            storage = {
-                ref: () => ({ put: () => Promise.reject(new Error("Firebase not available")) })
-            };
-            analytics = {
-                logEvent: () => {}
+                ref: () => ({ set: () => Promise.reject(new Error("Firebase not available")) })
             };
         }
 
@@ -3676,6 +3666,9 @@
                 
                 // Close download options
                 document.getElementById('downloadOptions').style.display = 'none';
+                
+                // Close template gallery if open
+                document.getElementById('templateGallery').style.display = 'none';
                 
                 // Close template gallery if open
                 document.getElementById('templateGallery').style.display = 'none';
