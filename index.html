@@ -192,11 +192,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics-compat.js" defer></script>
     
     <style>
         :root {
@@ -3335,260 +3335,100 @@
     <div id="pdf-container" style="position: absolute; left: -9999px; top: -9999px;"></div>
 
     <script>
- // SECURE Firebase configuration with error handling
-const firebaseConfig = {
-    apiKey: "AIzaSyAdOwMj250weD2L_RWBpNplNF5OmM1R6j8",
-    authDomain: "cv-build-tameerkhi.firebaseapp.com",
-    databaseURL: "https://cv-build-tameerkhi-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "cv-build-tameerkhi",
-    storageBucket: "cv-build-tameerkhi.appspot.com",
-    messagingSenderId: "453337479839",
-    appId: "1:453337479839:web:4ef4cd57c9c409aacb80aa",
-    measurementId: "G-VNGDH8HB5F"
-};
+        // SECURE Firebase configuration with error handling
+        const firebaseConfig = {
+            apiKey: "AIzaSyAdOwMj250weD2L_RWBpNplNF5OmM1R6j8",
+            authDomain: "cv-build-tameerkhi.firebaseapp.com",
+            databaseURL: "https://cv-build-tameerkhi-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "cv-build-tameerkhi",
+            storageBucket: "cv-build-tameerkhi.appspot.com",
+            messagingSenderId: "453337479839",
+            appId: "1:453337479839:web:4ef4cd57c9c409aacb80aa",
+            measurementId: "G-VNGDH8HB5F"
+        };
 
-// Firebase variables
-let auth, database, storage, analytics;
-
-// Enhanced Firebase initialization function
-function initializeFirebase() {
-    console.log("🚀 Starting Firebase initialization...");
-    
-    try {
-        // Check if Firebase SDK is loaded
-        if (typeof firebase === 'undefined') {
-            console.error('❌ Firebase SDK not loaded');
-            showNotification('Firebase SDK not loaded. Please refresh page.', 'error');
-            initializeFallbackMode();
-            return;
+        // Initialize Firebase with SECURE error handling
+        let auth, database, storage, analytics;
+        try {
+            if (firebase.apps.length === 0) {
+                firebase.initializeApp(firebaseConfig);
+            }
+            auth = firebase.auth();
+            database = firebase.database();
+            storage = firebase.storage();
+            analytics = firebase.analytics();
+            console.log("Firebase initialized successfully");
+        } catch (error) {
+            console.error("Firebase initialization error:", error);
+            // Provide SECURE fallback functionality
+            auth = { 
+                currentUser: null,
+                signInWithEmailAndPassword: () => Promise.reject(new Error("Firebase not available")),
+                createUserWithEmailAndPassword: () => Promise.reject(new Error("Firebase not available")),
+                signOut: () => Promise.reject(new Error("Firebase not available")),
+                onAuthStateChanged: (callback) => { callback(null); return () => {}; }
+            };
+            database = {
+                ref: () => ({ 
+                    set: () => Promise.reject(new Error("Firebase not available")),
+                    push: () => ({ set: () => Promise.reject(new Error("Firebase not available")) })
+                })
+            };
+            storage = {
+                ref: () => ({ put: () => Promise.reject(new Error("Firebase not available")) })
+            };
+            analytics = {
+                logEvent: () => {}
+            };
         }
 
-        console.log('✅ Firebase SDK is available');
-
-        // Initialize Firebase app
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-            console.log('✅ Firebase App Initialized');
-        } else {
-            console.log('ℹ️ Firebase App already initialized');
-            firebase.app();
-        }
-
-        // Initialize Firebase services
-        auth = firebase.auth();
-        database = firebase.database();
-        storage = firebase.storage();
-        analytics = firebase.analytics();
-        
-        console.log('✅ All Firebase services initialized');
-        
-        // Test Firebase connection
-        testFirebaseConnection();
-        
-        // Set up auth state listener
-        setupAuthListener();
-        
-    } catch (error) {
-        console.error('❌ Firebase initialization failed:', error);
-        showNotification('Firebase initialization failed: ' + error.message, 'error');
-        initializeFallbackMode();
-    }
-}
-
-// Test Firebase connection
-function testFirebaseConnection() {
-    if (database) {
-        database.ref('.info/connected').on('value', (snapshot) => {
-            if (snapshot.val() === true) {
-                console.log('✅ Firebase Database: CONNECTED');
-            } else {
-                console.log('❌ Firebase Database: DISCONNECTED');
-            }
-        });
-    }
-}
-
-// Setup authentication state listener
-function setupAuthListener() {
-    if (auth) {
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                console.log('✅ User signed in:', user.email);
-                updateUIForLoggedInUser();
-            } else {
-                console.log('✅ User signed out');
-                updateUIForLoggedOutUser();
-            }
-        });
-    }
-}
-
-// Update UI when user is logged in
-function updateUIForLoggedInUser() {
-    document.getElementById('loginBtn').classList.add('d-none');
-    document.getElementById('registerBtn').classList.add('d-none');
-    document.getElementById('adminBtn').classList.remove('d-none');
-    document.getElementById('logoutBtn').classList.remove('d-none');
-    
-    // Update mobile buttons
-    document.getElementById('mobileLoginBtn').classList.add('d-none');
-    document.getElementById('mobileRegisterBtn').classList.add('d-none');
-    document.getElementById('mobileAdminBtn').classList.remove('d-none');
-    document.getElementById('mobileLogoutBtn').classList.remove('d-none');
-}
-
-// Update UI when user is logged out
-function updateUIForLoggedOutUser() {
-    document.getElementById('loginBtn').classList.remove('d-none');
-    document.getElementById('registerBtn').classList.remove('d-none');
-    document.getElementById('adminBtn').classList.add('d-none');
-    document.getElementById('logoutBtn').classList.add('d-none');
-    
-    // Update mobile buttons
-    document.getElementById('mobileLoginBtn').classList.remove('d-none');
-    document.getElementById('mobileRegisterBtn').classList.remove('d-none');
-    document.getElementById('mobileAdminBtn').classList.add('d-none');
-    document.getElementById('mobileLogoutBtn').classList.add('d-none');
-}
-
-// Fallback mode when Firebase fails
-function initializeFallbackMode() {
-    console.warn('🔄 Running in fallback mode - Firebase not available');
-    
-    auth = { 
-        currentUser: null,
-        signInWithEmailAndPassword: () => {
-            showNotification('Firebase not available. Please check console.', 'error');
-            return Promise.reject(new Error("Firebase not available"));
-        },
-        createUserWithEmailAndPassword: () => {
-            showNotification('Firebase not available. Please check console.', 'error');
-            return Promise.reject(new Error("Firebase not available"));
-        },
-        signOut: () => {
-            showNotification('Firebase not available. Please check console.', 'error');
-            return Promise.reject(new Error("Firebase not available"));
-        },
-        onAuthStateChanged: (callback) => { 
-            console.log('Auth state changed - fallback mode');
-            callback(null); 
-            return () => {}; 
-        },
-        signInWithPopup: () => {
-            showNotification('Google Sign-In not available. Firebase connection failed.', 'error');
-            return Promise.reject(new Error("Firebase not available"));
-        }
-    };
-    
-    database = {
-        ref: () => ({ 
-            set: () => {
-                console.log('Database set - fallback mode');
-                showNotification('Database not available. Using fallback mode.', 'warning');
-                return Promise.resolve();
-            },
-            push: () => ({ 
-                set: () => {
-                    console.log('Database push - fallback mode');
-                    showNotification('Database not available. Using fallback mode.', 'warning');
-                    return Promise.resolve();
-                }
-            })
-        })
-    };
-    
-    storage = {
-        ref: () => ({ 
-            put: () => {
-                console.log('Storage put - fallback mode');
-                return Promise.resolve({ ref: { getDownloadURL: () => Promise.resolve('fallback-url') } });
-            }
-        })
-    };
-    
-    analytics = {
-        logEvent: () => console.log('Analytics event - fallback mode')
-    };
-}
-
-// Enhanced login function
-async function loginUser(email, password) {
-    try {
-        document.getElementById('loginSpinner').style.display = 'block';
-        const userCredential = await auth.signInWithEmailAndPassword(email, password);
-        document.getElementById('loginSpinner').style.display = 'none';
-        return userCredential;
-    } catch (error) {
-        document.getElementById('loginSpinner').style.display = 'none';
-        throw error;
-    }
-}
-
-// Enhanced register function
-async function registerUser(name, email, password) {
-    try {
-        document.getElementById('registerSpinner').style.display = 'block';
-        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-        
-        // Save user data to database
-        await database.ref('users/' + userCredential.user.uid).set({
-            name: name,
-            email: email,
-            createdAt: new Date().toISOString()
-        });
-        
-        document.getElementById('registerSpinner').style.display = 'none';
-        return userCredential;
-    } catch (error) {
-        document.getElementById('registerSpinner').style.display = 'none';
-        throw error;
-    }
-}
-
-// Initialize Firebase when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-    console.log("📄 Tameerkhi CV Builder - DOM fully loaded");
-    
-    // Initialize Firebase first
-    initializeFirebase();
-    
-    // Then initialize the rest of your app
-    initAutoSave();
-    updateProgressBar();
-       generatePreview();
-    
-          // Add event listeners to all form inputs for real-time preview
-                document.querySelectorAll('input, textarea').forEach(input => {
+        // Wait for DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("Tameerkhi CV Builder - DOM fully loaded");
+            
+            // Initialize auto-save functionality
+            initAutoSave();
+            
+            // Initialize progress bar
+            updateProgressBar();
+            
+            // Initialize the CV builder with default preview
+            generatePreview();
+            
+            // Add event listeners to all form inputs for real-time preview
+            document.querySelectorAll('input, textarea').forEach(input => {
                 input.addEventListener('input', function() {
-                 generatePreview();
-                  updateProgressBar();
-                 clearTimeout(window.autoSaveTimeout);
-                 window.autoSaveTimeout = setTimeout(autoSaveData, 1000);
+                    generatePreview();
+                    updateProgressBar();
+                    // Auto-save after a delay
+                    clearTimeout(window.autoSaveTimeout);
+                    window.autoSaveTimeout = setTimeout(autoSaveData, 1000);
+                });
             });
-        });
-    
-           // Template selection functionality
-                  document.querySelectorAll('.template-option').forEach(option => {
-                  option.addEventListener('click', function(e) {
-                  e.stopPropagation();
-                  
-                  document.querySelectorAll('.template-option').forEach(opt => {
-                      opt.classList.remove('active');
-               });
             
-                 this.classList.add('active');
+            // Template selection functionality
+            document.querySelectorAll('.template-option').forEach(option => {
+                option.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    
+                    // Remove active class from all options
+                    document.querySelectorAll('.template-option').forEach(opt => {
+                        opt.classList.remove('active');
+                    });
+                    
+                    // Add active class to clicked option
+                    this.classList.add('active');
+                    
+                    // Update current template display
+                    const templateName = this.getAttribute('data-template');
+                    document.getElementById('currentTemplate').textContent = 
+                        templateName.charAt(0).toUpperCase() + templateName.slice(1);
+                    
+                    // Regenerate preview with new template
+                    generatePreview();
+                });
+            });
             
-                  const templateName = this.getAttribute('data-template');
-                   document.getElementById('currentTemplate').textContent = 
-                   templateName.charAt(0).toUpperCase() + templateName.slice(1);
-            
-              generatePreview();
-           });
-       });
-      
-          // Continue with your existing event listeners...
-     });
-
             // Theme selection functionality
             document.querySelectorAll('.theme-option').forEach(option => {
                 option.addEventListener('click', function(e) {
