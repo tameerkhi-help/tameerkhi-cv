@@ -1,4 +1,4 @@
-// script.js
+// app.js
 // SECURE Firebase configuration with error handling
 const firebaseConfig = {
     apiKey: "AIzaSyAdOwMj250weD2L_RWBpNplNF5OmM1R6j8",
