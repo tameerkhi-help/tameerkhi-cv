@@ -3395,13 +3395,22 @@
             set: () => Promise.reject(new Error("Firebase not available - Domain configuration issue")),
             on: () => {},
             off: () => {}
-        })
-    };
-}
+          })
+       };
+    }
 
         // Wait for DOM to be fully loaded
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log("Tameerkhi CV Builder - DOM fully loaded");
+          document.addEventListener('DOMContentLoaded', function() {
+          console.log("Tameerkhi CV Builder - DOM fully loaded");
+    
+        // Domain validation check - YEH ADD KARO
+          const currentUrl = window.location.href;
+          if (!currentUrl.includes('www.tameerkhi.com') && !currentUrl.includes('localhost')) {
+          console.warn('Domain mismatch detected. Expected: www.tameerkhi.com, Current:', currentUrl);
+          setTimeout(() => {
+                showNotification('Warning: You are accessing Tameerkhi from an unexpected domain. Some features may not work correctly.', 'warning');
+            }, 5000);
+         }
             
             // Initialize auto-save functionality
             initAutoSave();
