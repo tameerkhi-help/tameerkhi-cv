@@ -7,7 +7,7 @@
     <!-- SEO Meta Tags -->
     <title>Tameerkhi - Free Professional CV Builder | Create ATS-Friendly Resumes</title>
     <meta name="description" content="Create professional, ATS-friendly CVs & resumes for FREE with Tameerkhi. 10+ templates. Download PDF, Word formats. Get hired faster with our CV builder!">
-    <link rel="canonical" href="https://tameerkhi.com/" />
+    <link rel="canonical" href="https://www.tameerkhi.com/" />
     <meta name="keywords" content="cv builder, resume maker, free cv creator, professional resume builder, ATS friendly cv, job cv maker, download cv pdf, free resume builder online, create cv online, professional cv templates, job application cv">
     <meta name="author" content="Tameerkhi">
     <meta name="robots" content="index, follow, max-image-preview:large">
@@ -30,7 +30,7 @@
     <meta property="og:title" content="Tameerkhi - Free Professional CV Builder | Create ATS-Friendly Resumes">
     <meta property="og:description" content="Create professional, ATS-friendly CVs for FREE. Download in PDF/Word formats. 10+ professional templates available.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://tameerkhi.com/">
+    <meta property="og:url" content="https://www.tameerkhi.com/">
     <meta property="og:image" content="https://i.ibb.co/jPkxswz8/file-0000000002a47208afe6a9f632d94592.png">
     <meta property="og:site_name" content="Tameerkhi">
 
@@ -46,7 +46,7 @@
     "@type": "Organization",
     "name": "Tameerkhi",
     "alternateName": "Tameerkhi CV Builder",
-    "url": "https://tameerkhi.com",
+    "url": "https://www.tameerkhi.com",
     "logo": "https://i.ibb.co/jPkxswz8/file-0000000002a47208afe6a9f632d94592.png",
     "description": "Tameerkhi is a free professional CV builder that helps you create stunning, ATS-friendly resumes in minutes. Choose from 10+ professional templates and download in PDF, Word, or Text formats.",
     "address": {
@@ -114,7 +114,7 @@
     "applicationCategory": "BusinessApplication",
     "operatingSystem": "Web Browser",
     "description": "Free professional CV builder to create ATS-friendly resumes with multiple templates",
-   "url": "https://tameerkhi.com",
+   "url": "https://www.tameerkhi.com",
    "offers": {
       "@type": "Offer",
       "price": "0",
@@ -132,7 +132,7 @@
     "Real-time Preview",
     "Cloud Saving"
   ],
-  "screenshot": "https://tameerkhi.com/screenshot.jpg",
+  "screenshot": "https://www.tameerkhi.com/screenshot.jpg",
   "softwareVersion": "2.0",
   "aggregateRating": {
     "@type": "AggregateRating",
@@ -3338,7 +3338,7 @@
         // SECURE Firebase configuration with error handling
         const firebaseConfig = {
             apiKey: "AIzaSyAdOwMj250weD2L_RWBpNplNF5OmM1R6j8",
-            authDomain: "cv-build-tameerkhi.firebaseapp.com",
+            authDomain: "www.tameerkhi.com",
             databaseURL: "https://cv-build-tameerkhi-default-rtdb.firebaseio.com",
             projectId: "cv-build-tameerkhi",
             storageBucket: "cv-build-tameerkhi.appspot.com",
@@ -3347,30 +3347,57 @@
             measurementId: "G-VNGDH8HB5F"
         };
 
-        // Initialize Firebase with SECURE error handling
-        let auth, database, storage, analytics;
-        try {
-            if (firebase.apps.length === 0) {
-                firebase.initializeApp(firebaseConfig);
-            }
-            auth = firebase.auth();
-            database = firebase.database();
-            storage = firebase.storage();
-            analytics = firebase.analytics();
-            console.log("Firebase initialized successfully");
-        } catch (error) {
-            console.error("Firebase initialization error:", error);
-            // Provide SECURE fallback functionality
-            auth = { 
-                currentUser: null,
-                signInWithEmailAndPassword: () => Promise.reject(new Error("Firebase not available")),
-                createUserWithEmailAndPassword: () => Promise.reject(new Error("Firebase not available")),
-                signOut: () => Promise.reject(new Error("Firebase not available"))
-            };
-            database = {
-                ref: () => ({ set: () => Promise.reject(new Error("Firebase not available")) })
-            };
+          // Enhanced Firebase initialization with domain checking
+          let auth, database, storage, analytics;
+       try {
+         // Check if we're on the correct domain
+         const currentDomain = window.location.hostname;
+         const expectedDomains = ['www.tameerkhi.com', 'tameerkhi.com'];
+    
+         if (!expectedDomains.includes(currentDomain)) {
+          console.warn('Unexpected domain:', currentDomain);
+       }
+    
+        if (firebase.apps.length === 0) {
+           firebase.initializeApp(firebaseConfig);
         }
+           auth = firebase.auth();
+           database = firebase.database();
+           storage = firebase.storage();
+           analytics = firebase.analytics();
+    
+         console.log("Firebase initialized successfully for domain:", currentDomain);
+    
+    // Test database connection
+    database.ref('.info/connected').on('value', (snap) => {
+        if (snap.val() === true) {
+            console.log("Firebase Realtime Database connected");
+        } else {
+            console.warn("Firebase Realtime Database not connected");
+        }
+    });
+    
+} catch (error) {
+    console.error("Firebase initialization error:", error);
+    // Enhanced fallback
+    auth = { 
+        currentUser: null,
+        signInWithEmailAndPassword: () => Promise.reject(new Error("Firebase not available - Domain configuration issue")),
+        createUserWithEmailAndPassword: () => Promise.reject(new Error("Firebase not available - Domain configuration issue")),
+        signOut: () => Promise.reject(new Error("Firebase not available - Domain configuration issue")),
+        onAuthStateChanged: (callback) => {
+            callback(null);
+            return () => {};
+        }
+    };
+    database = {
+        ref: () => ({ 
+            set: () => Promise.reject(new Error("Firebase not available - Domain configuration issue")),
+            on: () => {},
+            off: () => {}
+        })
+    };
+}
 
         // Wait for DOM to be fully loaded
         document.addEventListener('DOMContentLoaded', function() {
