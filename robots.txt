@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /admin/
 
-Sitemap: https://tameerkhi.com/sitemap.xml
+Sitemap: https://www.tameerkhi.com/sitemap.xml
