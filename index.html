@@ -3430,6 +3430,12 @@
                 showNotification('Warning: You are accessing Tameerkhi from an unexpected domain. Some features may not work correctly.', 'warning');
             }, 5000);
          }
+
+         // ✅ LAZY LOADING ADD KARO - YEH NAYA CODE
+          const images = document.querySelectorAll('img');
+            images.forEach(img => {
+              img.setAttribute('loading', 'lazy');
+        });
             
             // Initialize auto-save functionality
             initAutoSave();
